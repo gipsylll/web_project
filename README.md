@@ -1,5 +1,4 @@
 ```cli
-
 git clone https://github.com/gipsylll/web_project 
 
 cd web_project
