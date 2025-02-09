@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_pass
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: fastapi_app
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://app_user:app_pass@db:5432/app_db
+      JWT_SECRET_KEY: "SUPER_SECRET_JWT_KEY"
+      SIGNATURE_SECRET_KEY: "gfdmhghif38yrf9ew0jkf32"  # пример из ТЗ
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "adminpass"
+      USER_EMAIL: "user@example.com"
+      USER_PASSWORD: "userpass"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  db_data:
